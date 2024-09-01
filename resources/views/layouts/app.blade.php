@@ -38,7 +38,7 @@
         </div>
     </div>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-secondary bg-gradient shadow-sm">
+        <nav class="navbar navbar-expand-md navbar-light bg-warning bg-gradient shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     <img src="{{asset('images/cgm.png')}}" alt="DS CGM" class="img-responsive" width=35"> <strong>DS CGM - PT APO</strong>
