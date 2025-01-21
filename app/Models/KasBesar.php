@@ -12,7 +12,19 @@ class KasBesar extends Model
 
     public function lastKasBesar()
     {
-        return $this->latest()->orderBy('id', 'desc')->first();
+        // dd($this->orderBy('id', 'desc')->first());
+        return $this->orderBy('id', 'desc')->first();
+
+    }
+
+    public function saldoTerakhir()
+    {
+        return $this->orderBy('id', 'desc')->first()->saldo ?? 0;
+    }
+
+    public function modalInvestorTerakhir()
+    {
+        return $this->orderBy('id', 'desc')->first()->modal_investor_terakhir ?? 0;
     }
 
 

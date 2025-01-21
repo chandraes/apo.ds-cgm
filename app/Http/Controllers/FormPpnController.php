@@ -6,9 +6,7 @@ use App\Models\InvoicePpn;
 use App\Models\Transaksi;
 use App\Models\KasSupplier;
 use App\Models\KasBesar;
-use App\Services\StarSender;
 use App\Models\GroupWa;
-use App\Models\PesanWa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,7 +60,9 @@ class FormPpnController extends Controller
 
         $total_profit_bulan = ($totalTitipan+$totalTagihan+$last)-($modalInvestor+$totalPpn);
 
-        $group = GroupWa::where('untuk', 'kas-besar')->first();
+        $dbWa = new GroupWa;
+
+        $group = $dbWa->where('untuk', 'kas-besar')->first();
 
         $pesan =    "🔴🔴🔴🔴🔴🔴🔴🔴🔴\n".
                     "*Form PPn Customer*\n".
@@ -84,23 +84,8 @@ class FormPpnController extends Controller
                     "Rp. ".number_format($store->modal_investor_terakhir, 0, ',', '.')."\n\n".
                     "Terima kasih 🙏🙏🙏\n";
 
-        $send = new StarSender($group->nama_group, $pesan);
-        $res = $send->sendGroup();
+        $send = $dbWa->sendWa($group->nama_group, $pesan);
 
-        if ($res == 'true') {
-            PesanWa::create([
-                'pesan' => $pesan,
-                'tujuan' => $group->nama_group,
-                'status' => 1,
-            ]);
-        } else {
-            PesanWa::create([
-                'pesan' => $pesan,
-                'tujuan' => $group->nama_group,
-                'status' => 0,
-            ]);
-        }
-        
         DB::commit();
 
         return redirect()->route('billing')->with('success', 'Berhasil bayar ppn');

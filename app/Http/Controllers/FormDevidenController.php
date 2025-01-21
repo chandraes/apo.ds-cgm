@@ -7,11 +7,9 @@ use App\Models\Investor;
 use App\Models\Transaksi;
 use App\Models\InvoicePpn;
 use App\Models\KasSupplier;
-use App\Models\Rekening;
 use App\Models\GroupWa;
-use App\Models\PesanWa;
+use App\Models\Pajak\PpnKeluaran;
 use Illuminate\Http\Request;
-use App\Services\StarSender;
 use Carbon\Carbon;
 
 class FormDevidenController extends Controller
@@ -27,7 +25,7 @@ class FormDevidenController extends Controller
         $totalTagihan = $transaksi->totalTagihan()->sum('total_tagihan');
         $totalTitipan = $kasSupplier->saldoTitipan() ?? 0;
 
-        $ppn = InvoicePpn::where('bayar', false)->sum('total_ppn');
+        $ppn = PpnKeluaran::where('is_finish', 0)->sum('nominal');
 
         $investors = Investor::all();
         $totalPersentase = $investors->sum('persentase');
@@ -63,7 +61,11 @@ class FormDevidenController extends Controller
         }
 
         $investor = Investor::all();
-        $group = GroupWa::where('untuk', 'kas-besar')->first();
+
+        $dbWa = new GroupWa;
+
+        $group = $dbWa->where('untuk', 'kas-besar')->first();
+
         $month = Carbon::now()->locale('id')->monthName;
 
         $isiPesan = [];
@@ -126,23 +128,7 @@ class FormDevidenController extends Controller
 
         // looping $isiPesan
         foreach ($isiPesan as $pesan) {
-            $send = new StarSender($group->nama_group, $pesan);
-            $res = $send->sendGroup();
-
-            if ($res == 'true') {
-                PesanWa::create([
-                    'pesan' => $pesan,
-                    'tujuan' => $group->nama_group,
-                    'status' => 1,
-                ]);
-            } else {
-                PesanWa::create([
-                    'pesan' => $pesan,
-                    'tujuan' => $group->nama_group,
-                    'status' => 0,
-                ]);
-            }
-
+            $send = $dbWa->sendWa($group->nama_group, $pesan);
         }
 
         return redirect()->route('billing')->with('success', 'Data berhasil disimpan');

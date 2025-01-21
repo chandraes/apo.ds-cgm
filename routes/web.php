@@ -183,20 +183,66 @@ Route::group(['middleware' => ['auth']], function() {
             Route::delete('/form-transaksi/delete/{transaksi}', [App\Http\Controllers\FormTransaksiController::class, 'delete'])->name('form-transaksi.delete');
             Route::post('/form-transaksi/lanjutkan/{customer}', [App\Http\Controllers\FormTransaksiController::class, 'lanjutkan'])->name('form-transaksi.lanjutkan');
 
-            Route::get('/nota-tagihan/{customer}', [App\Http\Controllers\NotaTagihanController::class, 'index'])->name('nota-tagihan.index');
-            Route::patch('/nota-tagihan/edit/{transaksi}', [App\Http\Controllers\NotaTagihanController::class, 'edit_store'])->name('nota-tagihan.edit_store');
-            Route::post('/nota-tagihan/{customer}/cut-off', [App\Http\Controllers\NotaTagihanController::class, 'cutoff'])->name('nota-tagihan.cutoff');
+            Route::prefix('nota-tagihan')->group(function(){
+                Route::get('/{customer}', [App\Http\Controllers\NotaTagihanController::class, 'index'])->name('nota-tagihan.index');
+                Route::patch('/edit/{transaksi}', [App\Http\Controllers\NotaTagihanController::class, 'edit_store'])->name('nota-tagihan.edit_store');
+                Route::post('/{customer}/cut-off', [App\Http\Controllers\NotaTagihanController::class, 'cutoff'])->name('nota-tagihan.cutoff');
+
+                Route::prefix('keranjang')->group(function(){
+                    Route::get('/{customer}', [App\Http\Controllers\NotaTagihanController::class, 'keranjang'])->name('nota-tagihan.keranjang');
+                    Route::post('/delete/{transaksi}', [App\Http\Controllers\NotaTagihanController::class, 'keranjang_delete'])->name('nota-tagihan.keranjang.delete');
+                    Route::post('/lanjutkan/{customer}', [App\Http\Controllers\NotaTagihanController::class, 'keranjang_lanjut'])->name('nota-tagihan.keranjang.lanjutkan');
+                });
+            });
+
+
 
             Route::get('/nota-bayar', [App\Http\Controllers\NotaBayarController::class, 'index'])->name('nota-bayar.index');
             Route::post('/nota-bayar/{supplier}/cutoff', [App\Http\Controllers\NotaBayarController::class, 'cutoff'])->name('nota-bayar.cutoff');
 
-            Route::get('/invoice-ppn/{customer}', [App\Http\Controllers\InvoicePpnController::class, 'index'])->name('invoice-ppn.index');
-            Route::post('/invoice-ppn/{customer}/cutoff', [App\Http\Controllers\InvoicePpnController::class, 'cutoff'])->name('invoice-ppn.cutoff');
+            Route::prefix('invoice-ppn')->group(function(){
+                Route::get('/{customer}', [App\Http\Controllers\InvoicePpnController::class, 'index'])->name('invoice-ppn.index');
+                Route::post('/{customer}/cutoff', [App\Http\Controllers\InvoicePpnController::class, 'cutoff'])->name('invoice-ppn.cutoff');
+
+                Route::prefix('keranjang')->group(function(){
+                    Route::get('/{customer}', [App\Http\Controllers\InvoicePpnController::class, 'keranjang'])->name('invoice-ppn.keranjang');
+                    Route::post('/delete/{transaksi}', [App\Http\Controllers\InvoicePpnController::class, 'keranjang_delete'])->name('invoice-ppn.keranjang.delete');
+                    Route::post('/lanjutkan/{customer}', [App\Http\Controllers\InvoicePpnController::class, 'keranjang_lanjut'])->name('invoice-ppn.keranjang.lanjutkan');
+                });
+            });
+
+
 
         });
 
         Route::prefix('pajak')->group(function(){
             Route::get('/', [App\Http\Controllers\PajakController::class, 'index'])->name('pajak.index');
+            Route::get('/detail-tagihan/{invoice}', [App\Http\Controllers\PajakController::class, 'detail_tagihan'])->name('pajak.detail-tagihan');
+            Route::get('/detail-ppn/{invoice}', [App\Http\Controllers\PajakController::class, 'detail_ppn'])->name('pajak.detail-ppn');
+
+            Route::prefix('rekap-ppn')->group(function(){
+                Route::get('/', [App\Http\Controllers\PajakController::class, 'rekap_ppn'])->name('pajak.rekap-ppn');
+                Route::get('/masukan/{rekapPpn}', [App\Http\Controllers\PajakController::class, 'rekap_ppn_masukan_detail'])->name('pajak.rekap-ppn.masukan');
+                Route::get('/keluaran/{rekapPpn}', [App\Http\Controllers\PajakController::class, 'rekap_ppn_keluaran_detail'])->name('pajak.rekap-ppn.keluaran');
+            });
+
+            Route::prefix('ppn-masukan')->group(function(){
+                Route::get('/', [App\Http\Controllers\PajakController::class, 'ppn_masukan'])->name('pajak.ppn-masukan');
+                Route::patch('/store-faktur/{ppnMasukan}', [App\Http\Controllers\PajakController::class, 'ppn_masukan_store_faktur'])->name('pajak.ppn-masukan.store-faktur');
+                Route::post('/keranjang-store', [App\Http\Controllers\PajakController::class, 'ppn_masukan_keranjang_store'])->name('pajak.ppn-masukan.keranjang-store');
+                Route::post('/keranjang-destroy/{ppnMasukan}', [App\Http\Controllers\PajakController::class, 'ppn_masukan_keranjang_destroy'])->name('pajak.ppn-masukan.keranjang-destroy');
+                Route::post('/keranjang-lanjut', [App\Http\Controllers\PajakController::class, 'ppn_masukan_keranjang_lanjut'])->name('pajak.ppn-masukan.keranjang-lanjut');
+            });
+
+            Route::prefix('ppn-keluaran')->group(function(){
+                Route::get('/', [App\Http\Controllers\PajakController::class, 'ppn_keluaran'])->name('pajak.ppn-keluaran');
+                Route::post('/expired/{ppnKeluaran}', [App\Http\Controllers\PajakController::class, 'ppn_keluaran_expired'])->name('pajak.ppn-keluaran.expired');
+                Route::patch('/store-faktur/{ppnKeluaran}', [App\Http\Controllers\PajakController::class, 'ppn_keluaran_store_faktur'])->name('pajak.ppn-keluaran.store-faktur');
+                Route::get('/keranjang', [App\Http\Controllers\PajakController::class, 'ppn_keluaran_keranjang'])->name('pajak.ppn-keluaran.keranjang');
+                Route::post('/keranjang-store', [App\Http\Controllers\PajakController::class, 'ppn_keluaran_keranjang_store'])->name('pajak.ppn-keluaran.keranjang-store');
+                Route::post('/keranjang-destroy/{ppnKeluaran}', [App\Http\Controllers\PajakController::class, 'ppn_keluaran_keranjang_destroy'])->name('pajak.ppn-keluaran.keranjang-destroy');
+                Route::post('/keranjang-lanjut', [App\Http\Controllers\PajakController::class, 'ppn_keluaran_keranjang_lanjut'])->name('pajak.ppn-keluaran.keranjang-lanjut');
+            });
         });
 
     });
