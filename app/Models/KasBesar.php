@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,7 +36,19 @@ class KasBesar extends Model
 
     public function lastKasBesarByMonth($month, $year)
     {
-        return $this->whereMonth('tanggal', $month)->whereYear('tanggal', $year)->latest()->orderBy('id', 'desc')->first();
+        // return $this->whereMonth('tanggal', $month)->whereYear('tanggal', $year)->latest()->orderBy('id', 'desc')->first();
+        $data = $this->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$data) {
+            $data = $this->where('created_at', '<', Carbon::create($year, $month, 1))
+                    ->orderBy('id', 'desc')
+                    ->first();
+        }
+
+        return $data;
     }
 
     public function kasBesarNow($month, $year)
