@@ -105,14 +105,21 @@
 
         function funRek(){
             var supplier_id = document.getElementById('supplier_id').value;
+
             if(supplier_id == ''){
                 $('#transfer_ke').val('');
                 $('#bank').val('');
                 $('#no_rekening').val('');
                 return;
             } else {
+                // 1. Buat URL dengan placeholder ':id'
+                var url = "{{ route('form-supplier.get-rek-supplier', ':id') }}";
+
+                // 2. Ganti placeholder ':id' dengan variabel supplier_id dari JS
+                url = url.replace(':id', supplier_id);
+
                 $.ajax({
-                    url: "{{route('form-supplier.get-rek-supplier', '')}}"+"/"+supplier_id,
+                    url: url, // Gunakan variabel url yang sudah dimodifikasi
                     type: "GET",
                     dataType: "JSON",
                     success: function(data){
@@ -120,10 +127,13 @@
                         $('#bank').val(data.bank);
                         $('#no_rekening').val(data.no_rek);
                     },
+                    error: function() {
+                        alert('Gagal mengambil data rekening');
+                    }
                 });
             }
-
         }
+
 
         // masukForm on submit, sweetalert confirm
         $('#masukForm').submit(function(e){
