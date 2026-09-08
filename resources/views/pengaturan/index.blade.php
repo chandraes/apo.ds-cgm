@@ -61,9 +61,9 @@
     <div class="row justify-content-left">
         <h2 class="mt-2">OTHERS</h2>
         <div class="col-md-3 text-center mt-5">
-            <a href="#" class="text-decoration-none">
-                <img src="{{asset('images/kosong.svg')}}" alt="" width="70">
-                <h5 class="mt-3">APLIKASI</h5>
+            <a href="{{route('admin.settings.index')}}" class="text-decoration-none">
+                <img src="{{asset('images/admin.svg')}}" alt="" width="100">
+                <h2>Aplikasi</h2>
             </a>
         </div>
         <div class="col-md-3 text-center mt-5">

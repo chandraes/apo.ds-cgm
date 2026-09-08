@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,11 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
     Route::group(['middleware' => ['role:admin']], function() {
+
+         Route::prefix('admin')->group(function () {
+            Route::get('/settings', [SettingController::class, 'index'])->name('admin.settings.index');
+            Route::post('/settings', [SettingController::class, 'update'])->name('admin.settings.update');
+        });
         // ROUTE PENGATURAN
         Route::view('pengaturan', 'pengaturan.index')->name('pengaturan');
         Route::prefix('pengaturan')->group(function () {

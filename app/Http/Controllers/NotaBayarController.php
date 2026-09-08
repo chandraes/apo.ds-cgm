@@ -105,6 +105,8 @@ class NotaBayarController extends Controller
 
         $total_profit_bulan = ($totalTitipan+$totalTagihan+$last)-($modalInvestor+$totalPpn);
 
+        DB::commit();
+
         $dbWa = new GroupWa;
 
         $group = $dbWa->where('untuk', 'kas-besar')->first();
@@ -133,9 +135,27 @@ class NotaBayarController extends Controller
                     "Rp. ".number_format($store->modal_investor_terakhir, 0, ',', '.')."\n\n".
                     "Terima kasih 🙏🙏🙏\n";
 
-        $send = $dbWa->sendWa($group->nama_group, $pesan);
+        $pesanKasRam =  "🔴🔴🔴🔴🔴🔴🔴🔴🔴\n".
+                        "*Form Pembayaran Supplier*\n".
+                        "🔴🔴🔴🔴🔴🔴🔴🔴🔴\n\n".
+                        "*BS".$store->nomor_bayar."*\n\n".
+                        "Customer : ".$customer."\n".
+                        "Supplier : ".$invoice->supplier->nickname."\n\n".
+                        "Nilai :  *Rp. ".number_format($store->nominal_transaksi, 0, ',', '.')."*\n\n".
+                        "Ditransfer ke rek:\n\n".
+                        "Bank      : ".$store->bank."\n".
+                        "Nama    : ".$store->nama_rek."\n".
+                        "No. Rek : ".$store->no_rek."\n\n".
+                        "=========================\n".
+                        "Sisa Saldo Supplier: \n".
+                        "Rp. ".number_format($storeKeluar->saldo, 0, ',', '.')."\n\n".
+                        "Terima kasih 🙏🙏🙏\n";
 
-        DB::commit();
+        $groupKasRam = $dbWa->where('untuk', 'kas-ram')->first();
+
+        $sendKasRam = $dbWa->sendWa($groupKasRam->nama_group, $pesanKasRam);
+
+        $send = $dbWa->sendWa($group->nama_group, $pesan);
 
         return redirect()->route('billing')->with('success', 'Berhasil menambahkan pembayaran supplier');
     }

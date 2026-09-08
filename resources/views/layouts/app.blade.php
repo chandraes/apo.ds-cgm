@@ -8,9 +8,8 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- change favicon to saind.ico --}}
-    <link rel="shortcut icon" href="{{asset('images/cgm.png')}}" type="image/x-icon">
-
-    <title>{{ config('app.name', 'Laravel') }}</title>
+     <link rel="icon" type="image/x-icon" href="{{ $global_app_favicon }}">
+    <title>{{ $global_app_name }}</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
@@ -41,7 +40,13 @@
         <nav class="navbar navbar-expand-md navbar-light bg-warning bg-gradient shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    <img src="{{asset('images/cgm.png')}}" alt="DS CGM" class="img-responsive" width=35"> <strong>DS CGM SAWIT - PT BIL</strong>
+
+                       @if ($global_app_logo)
+                    <h3><img src="{{ $global_app_logo }}" alt="{{ $global_app_name }}" class="img-responsive" width="50"> {{ $global_app_name }}</h3>
+                    @else
+                    <h3>{{ $global_app_name }}</h3>
+                    @endif
+
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
