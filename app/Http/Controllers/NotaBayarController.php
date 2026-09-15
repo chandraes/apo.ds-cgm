@@ -111,6 +111,14 @@ class NotaBayarController extends Controller
 
         $group = $dbWa->where('untuk', 'kas-besar')->first();
 
+        // TOTAL TONASE PADA BULAN BERJALAN
+        $totalBeratKg = Transaksi::where('supplier_id', $invoice->supplier_id)
+                    ->whereMonth('tanggal', now()->month)
+                    ->whereYear('tanggal', now()->year)
+                    ->sum('berat');
+
+        $totalBeratTon = $totalBeratKg / 1000;
+
         $pesan =    "🔴🔴🔴🔴🔴🔴🔴🔴🔴\n".
                     "*Form Pembayaran Supplier*\n".
                     "🔴🔴🔴🔴🔴🔴🔴🔴🔴\n\n".
@@ -123,6 +131,8 @@ class NotaBayarController extends Controller
                     "Nama    : ".$store->nama_rek."\n".
                     "No. Rek : ".$store->no_rek."\n\n".
                     "==========================\n".
+                    "Total Tonase Supplier Bulan Ini : \n".
+                    number_format($totalBeratTon, 3, ',', '.')." Ton\n\n".
                     "Sisa Saldo Supplier: \n".
                     "Rp. ".number_format($storeKeluar->saldo, 0, ',', '.')."\n\n".
                     "Sisa Saldo Kas Besar : \n".
@@ -147,6 +157,8 @@ class NotaBayarController extends Controller
                         "Nama    : ".$store->nama_rek."\n".
                         "No. Rek : ".$store->no_rek."\n\n".
                         "=========================\n".
+                         "Total Tonase Supplier Bulan Ini : \n".
+                        number_format($totalBeratTon, 3, ',', '.')." Ton\n\n".
                         "Sisa Saldo Supplier: \n".
                         "Rp. ".number_format($storeKeluar->saldo, 0, ',', '.')."\n\n".
                         "Terima kasih 🙏🙏🙏\n";

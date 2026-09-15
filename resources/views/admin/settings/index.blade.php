@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('styles')
+@section('css')
 <style>
     /* Card Modern */
     .settings-card {
